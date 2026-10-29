@@ -2,20 +2,20 @@
   "title": "Dashboard chấm công AnnHome",
   "period": "01/09/2026–21/10/2026",
   "source": "BaoCaoChamCong_T9_T10_2026_3.xlsx",
-  "lastUpdated": "2026-10-29T08:55:00+07:00",
+  "lastUpdated": "2026-10-29T09:24:51+07:00",
   "definitions": {
     "attendanceRate": "Tổng công thực tế từ 01/09 đến 21/10 chia cho số công mục tiêu theo ngày vào công ty và trường.",
     "averageIndividualRate": "Trung bình tỷ lệ đi làm của từng người trong phòng ban.",
     "weightedAttendanceRate": "Tổng công thực tế của phòng ban chia cho tổng công mục tiêu của phòng ban."
   },
   "kpis": {
-    "headcount": 43,
-    "lateMinutes": 10797.0,
-    "lateFrequency": 597,
+    "headcount": 42,
+    "lateMinutes": 10625.0,
+    "lateFrequency": 595,
     "earlyMinutes": 982.0,
     "earlyFrequency": 118,
-    "averageAttendanceRate": 0.7852584587985401,
-    "weightedAttendanceRate": 0.7571939818872334
+    "averageAttendanceRate": 0.8003475851624302,
+    "weightedAttendanceRate": 0.7653306687391288
   },
   "departments": [
     {
@@ -90,13 +90,13 @@
     },
     {
       "department": "Media",
-      "headcount": 4,
-      "lateMinutes": 719.0,
-      "lateFrequency": 30,
+      "headcount": 3,
+      "lateMinutes": 547.0,
+      "lateFrequency": 28,
       "earlyMinutes": 42.0,
       "earlyFrequency": 4,
-      "averageIndividualRate": 0.5921786546786547,
-      "weightedAttendanceRate": 0.5534991324465008
+      "averageIndividualRate": 0.739066489066489,
+      "weightedAttendanceRate": 0.6603221083455344
     }
   ],
   "people": [
@@ -591,18 +591,6 @@
       "attendanceDays": 20.5,
       "targetDays": 38.5,
       "attendanceRate": 0.5324675324675324
-    },
-    {
-      "name": "Le Truong Trieu Vy",
-      "department": "Media",
-      "school": "FPT",
-      "lateMinutes": 172.0,
-      "lateFrequency": 2,
-      "earlyMinutes": 0.0,
-      "earlyFrequency": 0,
-      "attendanceDays": 2.5,
-      "targetDays": 16.5,
-      "attendanceRate": 0.15151515151515152
     },
     {
       "name": "Tran Thu Anh",
