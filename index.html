@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard chấm công AnnHome</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #5c6b78;
+      --line: #dbe2e8;
+      --paper: #ffffff;
+      --page: #f5f7fa;
+      --brand: #176b87;
+      --brand-dark: #104f66;
+      --teal: #159c98;
+      --amber: #d97a1a;
+      --rose: #c9575e;
+      --navy: #36598c;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+    main { max-width: 1480px; margin: 0 auto; padding: 30px 26px 50px; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: end; border-bottom: 2px solid var(--brand); padding-bottom: 16px; }
+    h1 { margin: 0; font-size: 26px; line-height: 1.2; color: var(--brand-dark); }
+    .period { margin: 7px 0 0; color: var(--muted); font-size: 14px; }
+    .source { margin: 0; text-align: right; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .filter-row { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin: 22px 0 18px; }
+    label { display: grid; gap: 6px; color: var(--muted); font-weight: 700; font-size: 13px; }
+    select { min-width: 220px; height: 36px; border: 1px solid #aebbc5; border-radius: 5px; background: #fff; color: var(--ink); padding: 0 10px; font: inherit; }
+    .population { margin: 0; color: var(--muted); font-size: 13px; }
+    .kpis { display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 14px; }
+    .kpi { min-height: 112px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 1px 2px #17212b0a; }
+    .kpi-label { color: var(--muted); font-size: 12px; font-weight: 700; line-height: 1.35; }
+    .kpi-value { margin-top: 11px; color: var(--ink); font-size: 26px; font-weight: 700; line-height: 1; }
+    .kpi-note { margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .section-title { margin: 30px 0 12px; font-size: 17px; color: var(--brand-dark); }
+    .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .chart-card { min-height: 330px; padding: 17px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+    .chart-card h2 { margin: 0 0 5px; font-size: 15px; color: var(--ink); }
+    .chart-note { min-height: 34px; margin: 0 0 8px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .chart { width: 100%; min-height: 238px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 7px; font-size: 12px; color: var(--muted); }
+    .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 2px; vertical-align: -1px; }
+    .detail-card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .table-title { padding: 16px 17px 12px; margin: 0; font-size: 15px; color: var(--ink); }
+    .table-wrap { overflow: auto; max-height: 680px; border-top: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 910px; }
+    thead { position: sticky; top: 0; z-index: 1; background: var(--brand-dark); color: #fff; }
+    th { padding: 11px 10px; color: #fff; font-size: 12px; text-align: center; white-space: normal; }
+    td { padding: 10px; border-bottom: 1px solid #eef1f4; font-size: 13px; }
+    td.text { text-align: left; } td.num { text-align: right; } td.rate { text-align: right; font-weight: 700; }
+    tbody tr:hover { background: #f0f7f9; }
+    .empty { padding: 35px; text-align: center; color: var(--muted); }
+    .axis { fill: #667482; font-size: 11px; }
+    .value-label { fill: #26333d; font-size: 11px; font-weight: 700; }
+    .grid { stroke: #e3e9ee; stroke-width: 1; }
+    .baseline { stroke: #9baab5; stroke-width: 1; }
+    @media (max-width: 1000px) { .kpis { grid-template-columns: repeat(2, minmax(150px, 1fr)); } .charts { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { main { padding: 20px 14px 36px; } header,.filter-row { display: block; } .source { margin-top: 12px; text-align: left; } .filter-row label { margin-top: 16px; } .population { margin-top: 12px; } .kpis { grid-template-columns: 1fr; } h1 { font-size: 23px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Dashboard chấm công AnnHome</h1>
+        <p class="period" id="period"></p>
+      </div>
+      <p class="source" id="source"></p>
+    </header>
+
+    <div class="filter-row">
+      <label for="departmentFilter">Phòng ban
+        <select id="departmentFilter" aria-label="Lọc theo phòng ban"></select>
+      </label>
+      <p class="population" id="population"></p>
+    </div>
+
+    <section class="kpis" aria-label="Chỉ số tổng quan">
+      <article class="kpi"><div class="kpi-label">Tổng số phút đi trễ</div><div class="kpi-value" id="lateMinutesKpi">–</div><div class="kpi-note">Gộp tháng 9 và tháng 10</div></article>
+      <article class="kpi"><div class="kpi-label">Tuần suất đi trễ</div><div class="kpi-value" id="lateFrequencyKpi">–</div><div class="kpi-note">Số lần phát sinh phút đi trễ</div></article>
+      <article class="kpi"><div class="kpi-label">Tổng số phút về sớm</div><div class="kpi-value" id="earlyMinutesKpi">–</div><div class="kpi-note">Gộp tháng 9 và tháng 10</div></article>
+      <article class="kpi"><div class="kpi-label">Tuần suất về sớm</div><div class="kpi-value" id="earlyFrequencyKpi">–</div><div class="kpi-note">Số lần phát sinh phút về sớm</div></article>
+      <article class="kpi"><div class="kpi-label">Tỷ lệ đi làm trung bình</div><div class="kpi-value" id="attendanceRateKpi">–</div><div class="kpi-note" id="weightedRateNote">–</div></article>
+    </section>
+
+    <h2 class="section-title">So sánh theo phòng ban</h2>
+    <section class="charts" aria-label="Biểu đồ theo phòng ban">
+      <article class="chart-card"><h2>Tỷ lệ đi làm trung bình</h2><p class="chart-note">Trung bình tỷ lệ của từng người trong mỗi phòng ban.</p><div class="chart" id="averageRateChart"></div></article>
+      <article class="chart-card"><h2>Tỷ lệ đi làm theo tổng công</h2><p class="chart-note">Tổng công thực tế của phòng ban chia cho tổng công mục tiêu.</p><div class="chart" id="weightedRateChart"></div></article>
+      <article class="chart-card"><h2>Phút đi trễ và về sớm</h2><p class="chart-note">Tổng phút theo từng phòng ban.</p><div class="chart" id="minutesChart"></div><div class="legend"><span><i style="background:#176b87"></i>Đi trễ</span><span><i style="background:#d97a1a"></i>Về sớm</span></div></article>
+      <article class="chart-card"><h2>Tần suất đi trễ và về sớm</h2><p class="chart-note">Số lần có phát sinh phút theo từng phòng ban.</p><div class="chart" id="frequencyChart"></div><div class="legend"><span><i style="background:#176b87"></i>Đi trễ</span><span><i style="background:#d97a1a"></i>Về sớm</span></div></article>
+    </section>
+
+    <h2 class="section-title">Chi tiết theo nhân sự</h2>
+    <section class="detail-card" aria-label="Bảng chỉ số nhân sự">
+      <h2 class="table-title">Tổng hợp chỉ số tháng 9–10</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>TT</th><th>Họ và tên</th><th>Phòng ban</th><th>Tổng số phút đi trễ</th><th>Tuần suất đi trễ</th><th>Tổng số phút về sớm</th><th>Tuần suất về sớm</th><th>Tỉ lệ đi làm</th></tr></thead>
+          <tbody id="detailRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const formatter = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 });
+    const percent = value => value == null ? '–' : new Intl.NumberFormat('vi-VN', { style: 'percent', maximumFractionDigits: 1 }).format(value);
+    const sum = (rows, key) => rows.reduce((total, row) => total + (Number(row[key]) || 0), 0);
+    const escapeHtml = value => String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+    function svgWrapper(inner, label) {
+      return `<svg viewBox="0 0 620 270" role="img" aria-label="${escapeHtml(label)}" preserveAspectRatio="none">${inner}</svg>`;
+    }
+    function singleBars(rows, valueKey, label, color, isPercent = false) {
+      if (!rows.length) return '<div class="empty">Không có dữ liệu cho lựa chọn này.</div>';
+      const max = Math.max(...rows.map(r => Number(r[valueKey]) || 0), 0.01);
+      const left = 150, right = 50, top = 14, height = 224, rowH = height / rows.length;
+      let content = `<line class="baseline" x1="${left}" y1="${top}" x2="${left}" y2="${top + height}"/>`;
+      rows.forEach((row, index) => {
+        const value = Number(row[valueKey]) || 0;
+        const y = top + index * rowH + 5;
+        const width = (value / max) * (620 - left - right);
+        const display = isPercent ? percent(value) : formatter.format(value);
+        content += `<text class="axis" x="${left - 8}" y="${y + 13}" text-anchor="end">${escapeHtml(row.department)}</text>`;
+        content += `<rect x="${left}" y="${y}" width="${width}" height="${Math.max(10, rowH - 10)}" rx="3" fill="${color}"/>`;
+        content += `<text class="value-label" x="${left + width + 7}" y="${y + 13}">${display}</text>`;
+      });
+      return svgWrapper(content, label);
+    }
+    function groupedBars(rows, firstKey, secondKey, label) {
+      if (!rows.length) return '<div class="empty">Không có dữ liệu cho lựa chọn này.</div>';
+      const max = Math.max(...rows.flatMap(r => [Number(r[firstKey]) || 0, Number(r[secondKey]) || 0]), 0.01);
+      const left = 150, right = 58, top = 14, height = 224, rowH = height / rows.length;
+      let content = `<line class="baseline" x1="${left}" y1="${top}" x2="${left}" y2="${top + height}"/>`;
+      rows.forEach((row, index) => {
+        const y = top + index * rowH + 4;
+        const barH = Math.max(7, (rowH - 11) / 2);
+        const first = Number(row[firstKey]) || 0, second = Number(row[secondKey]) || 0;
+        const firstW = first / max * (620 - left - right), secondW = second / max * (620 - left - right);
+        content += `<text class="axis" x="${left - 8}" y="${y + barH + 7}" text-anchor="end">${escapeHtml(row.department)}</text>`;
+        content += `<rect x="${left}" y="${y}" width="${firstW}" height="${barH}" rx="2" fill="#176b87"/><text class="value-label" x="${left + firstW + 5}" y="${y + barH - 1}">${formatter.format(first)}</text>`;
+        content += `<rect x="${left}" y="${y + barH + 3}" width="${secondW}" height="${barH}" rx="2" fill="#d97a1a"/><text class="value-label" x="${left + secondW + 5}" y="${y + barH * 2 + 2}">${formatter.format(second)}</text>`;
+      });
+      return svgWrapper(content, label);
+    }
+
+    function aggregateDepartments(people) {
+      const groups = new Map();
+      people.forEach(person => {
+        const key = person.department || 'Chưa xác định';
+        if (!groups.has(key)) groups.set(key, { department: key, headcount: 0, lateMinutes: 0, lateFrequency: 0, earlyMinutes: 0, earlyFrequency: 0, attendanceDays: 0, targetDays: 0, rateSum: 0 });
+        const group = groups.get(key);
+        group.headcount += 1;
+        group.lateMinutes += person.lateMinutes;
+        group.lateFrequency += person.lateFrequency;
+        group.earlyMinutes += person.earlyMinutes;
+        group.earlyFrequency += person.earlyFrequency;
+        group.attendanceDays += person.attendanceDays;
+        group.targetDays += person.targetDays;
+        group.rateSum += person.attendanceRate;
+      });
+      return [...groups.values()].map(group => ({
+        ...group,
+        averageIndividualRate: group.rateSum / group.headcount,
+        weightedAttendanceRate: group.attendanceDays / group.targetDays
+      })).sort((a,b) => a.department.localeCompare(b.department, 'vi'));
+    }
+
+    function render(data) {
+      const selected = document.getElementById('departmentFilter').value;
+      const people = selected === 'Tất cả' ? data.people : data.people.filter(person => person.department === selected);
+      const departments = aggregateDepartments(people);
+      const totalLateMinutes = sum(people, 'lateMinutes');
+      const totalLateFrequency = sum(people, 'lateFrequency');
+      const totalEarlyMinutes = sum(people, 'earlyMinutes');
+      const totalEarlyFrequency = sum(people, 'earlyFrequency');
+      const totalAttendance = sum(people, 'attendanceDays');
+      const totalTarget = sum(people, 'targetDays');
+      const averageRate = people.length ? sum(people, 'attendanceRate') / people.length : null;
+      const weightedRate = totalTarget ? totalAttendance / totalTarget : null;
+
+      document.getElementById('population').textContent = `${people.length} nhân sự | ${departments.length} phòng ban`;
+      document.getElementById('lateMinutesKpi').textContent = `${formatter.format(totalLateMinutes)} phút`;
+      document.getElementById('lateFrequencyKpi').textContent = `${formatter.format(totalLateFrequency)} lần`;
+      document.getElementById('earlyMinutesKpi').textContent = `${formatter.format(totalEarlyMinutes)} phút`;
+      document.getElementById('earlyFrequencyKpi').textContent = `${formatter.format(totalEarlyFrequency)} lần`;
+      document.getElementById('attendanceRateKpi').textContent = percent(averageRate);
+      document.getElementById('weightedRateNote').textContent = `Theo tổng công: ${percent(weightedRate)}`;
+      document.getElementById('averageRateChart').innerHTML = singleBars(departments, 'averageIndividualRate', 'Tỷ lệ đi làm trung bình theo phòng ban', '#159c98', true);
+      document.getElementById('weightedRateChart').innerHTML = singleBars(departments, 'weightedAttendanceRate', 'Tỷ lệ theo tổng công theo phòng ban', '#36598c', true);
+      document.getElementById('minutesChart').innerHTML = groupedBars(departments, 'lateMinutes', 'earlyMinutes', 'Tổng phút đi trễ và về sớm theo phòng ban');
+      document.getElementById('frequencyChart').innerHTML = groupedBars(departments, 'lateFrequency', 'earlyFrequency', 'Tần suất đi trễ và về sớm theo phòng ban');
+      document.getElementById('detailRows').innerHTML = people.map((person, index) => `<tr><td class="num">${index + 1}</td><td class="text">${escapeHtml(person.name)}</td><td class="text">${escapeHtml(person.department)}</td><td class="num">${formatter.format(person.lateMinutes)}</td><td class="num">${formatter.format(person.lateFrequency)}</td><td class="num">${formatter.format(person.earlyMinutes)}</td><td class="num">${formatter.format(person.earlyFrequency)}</td><td class="rate">${percent(person.attendanceRate)}</td></tr>`).join('');
+    }
+
+    fetch('./data.json').then(response => response.json()).then(data => {
+      document.getElementById('period').textContent = `Kỳ dữ liệu: ${data.period}`;
+      document.getElementById('source').innerHTML = `Nguồn: ${escapeHtml(data.source)}<br>Cập nhật lúc: ${new Date(data.lastUpdated).toLocaleString('vi-VN')}`;
+      const select = document.getElementById('departmentFilter');
+      const departments = [...new Set(data.people.map(person => person.department))].sort((a,b) => a.localeCompare(b, 'vi'));
+      select.innerHTML = ['Tất cả', ...departments].map(department => `<option value="${escapeHtml(department)}">${escapeHtml(department)}</option>`).join('');
+      select.addEventListener('change', () => render(data));
+      render(data);
+    }).catch(error => {
+      document.querySelector('main').innerHTML = `<p class="empty">Không thể tải dữ liệu dashboard: ${escapeHtml(error.message)}</p>`;
+    });
+  </script>
+</body>
+</html>
